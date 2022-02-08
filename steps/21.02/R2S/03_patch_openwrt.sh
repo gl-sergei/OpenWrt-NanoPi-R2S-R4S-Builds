@@ -10,7 +10,8 @@ BUILDDIR="$ROOTDIR/build"
 
 cd "$BUILDDIR/openwrt"
 OPENWRT_SUFFIX=2102
-IMMORTAL_SUFFIX=2102
+OPENWRT_BRANCH=21.02
+
 # -------------- UBOOT -----------------------------------
 # replace uboot with local uboot package
 # this version does not need arm-trusted-firmware-rk3328
@@ -20,7 +21,7 @@ cp -R $ROOTDIR/package/uboot-rockchip package/boot/
 # -------------- target rockchip / linux ----------------
 # replace target rockchip with immortalwrt one
 rm -rf target/linux/rockchip
-cp -R $BUILDDIR/immortal-fresh-$IMMORTAL_SUFFIX/target/linux/rockchip target/linux/
+cp -R $ROOTDIR/patches/$OPENWRT_BRANCH/immortalwrt/target/linux/rockchip target/linux/
 
 # remove patches that make kernel panic
 #rm target/linux/rockchip/patches-5.4/007*  
@@ -58,7 +59,7 @@ EOT
 # https://forum.armbian.com/topic/15165-nanopi-r2s-lan0-goes-offline-with-high-traffic/
 # the patch idea is taken from https://github.com/friendlyarm/kernel-rockchip/blob/nanopi-r2-v5.4.y-opp1/drivers/net/usb/r8152.c
 # I just add a backport ov v1.11.11 instead
-cp $ROOTDIR/patches/kernel-5.4/001-r8152-v1-11-11.patch target/linux/rockchip/patches-5.4/
+cp $ROOTDIR/patches/$OPENWRT_BRANCH/kernel-5.4/001-r8152-v1-11-11.patch target/linux/rockchip/patches-5.4/
 
 # usb3 phy driver
 # cleanup immortalwrt
@@ -67,7 +68,7 @@ rm target/linux/rockchip/patches-5.4/808*
 rm target/linux/rockchip/Documentation/devicetree/bindings/phy/phy-rockchip-inno-usb3.yaml
 
 #copy crafted patch
-cp $ROOTDIR/patches/kernel-5.4/add-rk3328-usb3-phy-driver.patch target/linux/rockchip/patches-5.4/808-add-rk3328-usb3-phy-driver.patch
+cp $ROOTDIR/patches/$OPENWRT_BRANCH/kernel-5.4/add-rk3328-usb3-phy-driver.patch target/linux/rockchip/patches-5.4/808-add-rk3328-usb3-phy-driver.patch
 # enable PHY usb3 for r2s
 sed -i 's/# CONFIG_PHY_ROCKCHIP_INNO_USB3 is not set/CONFIG_PHY_ROCKCHIP_INNO_USB3=y/' target/linux/rockchip/armv8/config-5.4
 
@@ -81,16 +82,16 @@ sed -i 's/# CONFIG_PHY_ROCKCHIP_INNO_USB3 is not set/CONFIG_PHY_ROCKCHIP_INNO_US
 
 # new video module dependancy for rockchip drm
 rm -f package/kernel/linux/modules/video.mk
-cp -R $BUILDDIR/immortal-fresh-$IMMORTAL_SUFFIX/package/kernel/linux/modules/video.mk package/kernel/linux/modules/
+cp -R $ROOTDIR/patches/$OPENWRT_BRANCH/immortalwrt/package/kernel/linux/modules/video.mk package/kernel/linux/modules/
 
 # r8168 driver for r4s
-cp -R $BUILDDIR/immortal-fresh-$IMMORTAL_SUFFIX/package/kernel/r8168 package/kernel/
+cp -R $ROOTDIR/patches/$OPENWRT_BRANCH/immortalwrt/package/kernel/r8168 package/kernel/
 
 # r8152 driver from realtek
 #cp -R $BUILDDIR/immortal-fresh/package/kernel/r8152 package/kernel/
 
 # copy extra patch from immortalwrt
-cp $BUILDDIR/immortal-fresh-$IMMORTAL_SUFFIX/package/libs/mbedtls/patches/100-Implements-AES-and-GCM-with-ARMv8-Crypto-Extensions.patch \
+cp $ROOTDIR/patches/$OPENWRT_BRANCH/immortalwrt/package/libs/mbedtls/patches/100-Implements-AES-and-GCM-with-ARMv8-Crypto-Extensions.patch \
    package/libs/mbedtls/patches/
 
 # enable watchdog
@@ -104,7 +105,7 @@ cp $BUILDDIR/immortal-fresh-$IMMORTAL_SUFFIX/package/libs/mbedtls/patches/100-Im
 if ! grep -q "0002-kernel-crypto.addon" target/linux/rockchip/armv8/config-5.4; then
    echo "Adding 0002-kernel-crypto.addon to target/linux/rockchip/armv8/config-5.4"
    echo "# --- 0002-kernel-crypto.addon " >> target/linux/rockchip/armv8/config-5.4
-   cat $ROOTDIR/patches/0002-kernel-crypto.addon >> target/linux/rockchip/armv8/config-5.4
+   cat $ROOTDIR/patches/$OPENWRT_BRANCH/0002-kernel-crypto.addon >> target/linux/rockchip/armv8/config-5.4
 else
    echo "Already added 0002-kernel-crypto.addon to target/linux/rockchip/armv8/config-5.4"
 fi

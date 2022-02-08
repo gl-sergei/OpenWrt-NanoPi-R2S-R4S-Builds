@@ -1,21 +1,42 @@
-## OpenWrt for Rockchip rk3328/rk3399, include Nanopi R2S/R4S
-#### ⚠ WARNING: NO SUPPORT / USE IT UNDER YOUR OWN RISK  ⚠ 
-[![NanoPi R2S 21.02](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/actions/workflows/NanoPi-r2s-21.02.yml/badge.svg)](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/actions/workflows/NanoPi-r2s-21.02.yml)
+## OpenWrt Builds for NanoPi R2S & NanoPi R4S
+#### ⚠ WARNING: NO SUPPORT / USE AT YOUR OWN RISK  ⚠ 
+[![NanoPi Build](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/actions/workflows/NanoPi-Build.yml/badge.svg)](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/actions/workflows/NanoPi-Build.yml)
 
-##### Download: [Releases](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/releases) or [Actions](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/actions) \(Login Needed\)
+##### Download: [Releases](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/releases)
 - - -
 ## Introduction
-Those are my customized builds of OpenWrt for FriendlyARM NanoPi R2S / R4S
+Automated builds of OpenWrt for FriendlyARM NanoPi R2S & R4S boards
 
-## Config
+## OpenWrt branch 21.02 (stable)
+
+### Downloads [Releases 21.02](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/releases?q=21.02&expanded=true)
+
+### Configuration
 - OpenWRT 21.02 Vanilla / Kernel 5.4
-- Some ImmortalWRT patches for Rockchip target NanoPi R2S (rk3328) / NanoPi R4S support (rk3399) (avoiding the ones creating kernel oopses)
+- ImmortalWRT patches for Rockchip target NanoPi R2S (rk3328) / NanoPi R4S support (rk3399)
 - NanoPi R2S : r8152 driver v1.11.11 backport from kernel 5.10 + realtek r8169 firmwares package
 - NanoPi R4S : r8168 driver for R4S (realtek) instead of kernel r8169 + r8169 firmwares package
 
-## Applications
+### Applications
 - A useful set of applications from official OpenWrt package feed
+- Mini build without UI
+- Full build with LuCI, docker and extra packages
 - vpn-routing-policy latest version from https://github.com/stangri/source.openwrt.melmac.net
+
+## OpenWrt branch master (added soon)
+
+### Downloads [Releases master](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/releases?q=master&expanded=true)
+
+### Configuration
+- OpenWRT master Vanilla / Kernel 5.10
+- ImmortalWRT patches for Rockchip target NanoPi R2S (rk3328) / NanoPi R4S support (rk3399)
+
+### Applications
+- A useful set of applications from official OpenWrt package feed
+- Mini build without UI
+- Full build with LuCI, docker and extra packages
+- pbr latest version from https://github.com/stangri/source.openwrt.melmac.net
+
 
 ## Changelog
 
