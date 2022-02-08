@@ -64,9 +64,9 @@ jobs:
           echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
           echo "TZ=Europe/Paris" >>$GITHUB_ENV
           echo "Build_Date=$(date +%Y.%m.%d)" >> $GITHUB_ENV
-          echo "RELTAG=v$(date +'%Y%m%d').${{ inputs.release_id }}" >> $GITHUB_ENV
-          echo "OPENWRT_BRANCH=${{ inputs.openwrt_branch }}" >> $GITHUB_ENV
-          echo "NANOPI_MODEL=${{ inputs.nanopi_model }}" >> $GITHUB_ENV
+          echo "RELTAG=v$(date +'%Y%m%d').${{ github.events.inputs.release_id }}" >> $GITHUB_ENV
+          echo "OPENWRT_BRANCH=${{ github.events.inputs.openwrt_branch }}" >> $GITHUB_ENV
+          echo "NANOPI_MODEL=${{ github.events.inputs.nanopi_model }}" >> $GITHUB_ENV
 
       - name: Show env
         run: echo $GITHUB_ENV
@@ -149,7 +149,7 @@ jobs:
           echo "TZ=Europe/Paris" >>$GITHUB_ENV
           echo "Build_Date=$(date +%Y-%m-%d %H:%M)" >> $GITHUB_ENV
           echo "RELDATE=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
-          echo "RELTAG=v$(date +'%Y%m%d').${{ inputs.release_id }}" >> $GITHUB_ENV
+          echo "RELTAG=v$(date +'%Y%m%d').${{ github.events.inputs.release_id }}" >> $GITHUB_ENV
       
       - name: Organize files mini
         id: organizemini
