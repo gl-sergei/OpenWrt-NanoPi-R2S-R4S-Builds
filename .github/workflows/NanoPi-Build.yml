@@ -75,7 +75,7 @@ jobs:
         cd ..
         pwd
         mkdir artifact
-        tar --posix -Jcvf artifact/source_test.tar.gz OpenWrt-NanoPi-R2S-R4S-Builds
+        tar --posix -Jcvf artifact/source_test.tar.xz OpenWrt-NanoPi-R2S-R4S-Builds
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
