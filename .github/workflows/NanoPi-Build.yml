@@ -152,6 +152,9 @@ jobs:
         rm toolchain_built.tar
       working-directory: ..
 
+    - name: list files (debug)
+      run: ls -l
+
     - name: Prepare Build deps
       uses: ./.github/actions/setup-devenv
     
