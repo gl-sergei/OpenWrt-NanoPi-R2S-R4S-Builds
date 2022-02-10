@@ -122,13 +122,13 @@ jobs:
         pwd
         cd ..
         pwd
-        tar --posix -Jcvf toolchain_built.tar.xz OpenWrt-NanoPi-R2S-R4S-Builds
+        tar --posix -cvf toolchain_built.tar OpenWrt-NanoPi-R2S-R4S-Builds
 
     - name: Upload artifact
       uses: actions/upload-artifact@v2
       with:
         name: toolchain_built
-        path: ~/work/OpenWrt-NanoPi-R2S-R4S-Builds/toolchain_built.tar.xz
+        path: ~/work/OpenWrt-NanoPi-R2S-R4S-Builds/toolchain_built.tar
   
   build:
     needs: toolchain
@@ -148,8 +148,8 @@ jobs:
     
     - name: Unpack and clean toolchain artifact
       run: |
-        tar Jxvf toolchain_built.tar.xz
-        rm toolchain_built.tar.xz
+        tar xvf toolchain_built.tar
+        rm toolchain_built.tar
       working-directory: ..
 
     - name: Prepare Build deps
