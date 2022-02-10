@@ -119,11 +119,11 @@ jobs:
     
     - name: Unpack and clean toolchain artifact
       run: |
+        cd ~/work/
         tar xf toolchain_built.tar
         rm toolchain_built.tar
         pwd
         ls -l
-      working-directory: ../..
 
     - name: list files (debug)
       run: ls -l
@@ -147,6 +147,10 @@ jobs:
       run: |
         date
         ls -al build/openwrt/dl
+
+    - name: Load ao full Config
+      run: |
+        /bin/bash ./steps/06-create_config_from_seed.sh
 
     - name: Download package
       run: |
