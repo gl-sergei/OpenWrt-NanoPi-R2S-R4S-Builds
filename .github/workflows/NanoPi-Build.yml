@@ -48,13 +48,13 @@ jobs:
     if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@main
     
-    - name: Prepare Build deps
+    - name: Setup Linux Requirements
       uses: ./.github/actions/setup-devenv
 
-    - name: Set env
+    - name: Set GITHUB_ENV
       run: |
         echo "SSH_ACTIONS=false" >> $GITHUB_ENV
         echo "UPLOAD_BIN_DIR=false" >> $GITHUB_ENV
@@ -66,69 +66,21 @@ jobs:
         echo "OPENWRT_BRANCH=${{ github.event.inputs.openwrt_branch }}" >> $GITHUB_ENV
         echo "NANOPI_MODEL=${{ github.event.inputs.nanopi_model }}" >> $GITHUB_ENV
 
-    - name: Show env
-      run: echo $GITHUB_ENV
-
-    - name: Pack source
-      run: |
-        pwd
-        cd ..
-        pwd
-        mkdir artifact
-        tar --posix -Jcvf artifact/source_test.tar.xz OpenWrt-NanoPi-R2S-R4S-Builds
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: source_test
-        path: ~/work/OpenWrt-NanoPi-R2S-R4S-Builds/artifact/source_test.tar.xz
-
-  toolchain2:
-    needs: toolchain
-    runs-on: ubuntu-20.04
-    if: github.event.repository.owner.id == github.event.sender.id
-
-    steps:
-    - name: Retrieve src TMP
-      uses: actions/download-artifact@v2
-      with:
-        name: source_test
-        path: ~/work/OpenWrt-NanoPi-R2S-R4S-Builds/
-    
-    - name: Unpack source
-      run: tar Jxvf source_test.tar.xz
-      working-directory: ..
-
-    - name: Prepare Build deps
-      uses: ./.github/actions/setup-devenv
-
-    - name: Set env
-      run: |
-        echo "SSH_ACTIONS=false" >> $GITHUB_ENV
-        echo "UPLOAD_BIN_DIR=false" >> $GITHUB_ENV
-        echo "UPLOAD_FIRMWARE=true" >> $GITHUB_ENV
-        echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
-        echo "TZ=Europe/Paris" >>$GITHUB_ENV
-        echo "Build_Date=$(date +%Y.%m.%d)" >> $GITHUB_ENV
-        echo "RELTAG=v$(date +'%Y%m%d').${{ github.event.inputs.release_id }}" >> $GITHUB_ENV
-        echo "OPENWRT_BRANCH=${{ github.event.inputs.openwrt_branch }}" >> $GITHUB_ENV
-        echo "NANOPI_MODEL=${{ github.event.inputs.nanopi_model }}" >> $GITHUB_ENV
-
-    - name: Show env
+    - name: Show GITHUB_ENV
       run: echo $GITHUB_ENV
 
     - name: Clone OpenWrt source
-      run: |
-        /bin/bash ./steps/$OPENWRT_BRANCH/01_clone_openwrt.sh
+      run: /bin/bash ./steps/$OPENWRT_BRANCH/01_clone_openwrt.sh
+    
     - name: Make working copy of OpenWrt source
-      run: |
-        /bin/bash ./steps/$OPENWRT_BRANCH/02_prepare_openwrt_folder.sh
-    - name: Patch OpenWrt source R2S / 21.02
-      run: |
-        /bin/bash ./steps/$OPENWRT_BRANCH/$NANOPI_MODEL/03_patch_openwrt.sh
+      run: /bin/bash ./steps/$OPENWRT_BRANCH/02_prepare_openwrt_folder.sh
+    
+    - name: Patch OpenWrt Source
+      run: /bin/bash ./steps/$OPENWRT_BRANCH/$NANOPI_MODEL/03_patch_openwrt.sh
+    
     - name: Prepare package
-      run: |
-        /bin/bash ./steps/04-prepare_package.sh
+      run: /bin/bash ./steps/04-prepare_package.sh
+    
     - name: Add ACL
       run: |
         /bin/bash ./steps/05-create_luci_acl.sh
@@ -152,6 +104,7 @@ jobs:
         cd build/openwrt
         let make_process=$(nproc)+2
         make toolchain/install -j${make_process}
+    
     - name: If toolchain Error
       if: steps.compiletoolchain.outcome == 'failure'
       run: |
@@ -178,7 +131,7 @@ jobs:
         path: ~/work/OpenWrt-NanoPi-R2S-R4S-Builds/toolchain_built.tar.xz
   
   build:
-    needs: toolchain2
+    needs: toolchain
     runs-on: ubuntu-20.04
     steps:
     - name: Dump github context
