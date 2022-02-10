@@ -111,11 +111,11 @@ jobs:
         echo '================================================================'
         cd build/openwrt && make toolchain/install -j1 V=s
     
-    - name: Try cleaning build_dir properly before packing
+    - name: Try cleaning build_dir before packing
       run: |
         cd build/openwrt
-        make clean
-        rm -rf build_dir/*
+        ls -l build_dir/
+        rm -rf build_dir/host build_dir/toolchain* 
 
     - name: Pack toolchain
       run: |
