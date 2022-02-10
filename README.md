@@ -1,5 +1,6 @@
 ## OpenWrt Builds for NanoPi R2S & NanoPi R4S
 Automated builds of OpenWrt for FriendlyARM NanoPi R2S & R4S boards
+
 ⚠ Warning: No support / Use at your own risk  ⚠ 
 
 [![NanoPi Build](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/actions/workflows/NanoPi-Build.yml/badge.svg)](https://github.com/anaelorlinski/OpenWrt-NanoPi-R2S-R4S-Builds/actions/workflows/NanoPi-Build.yml)

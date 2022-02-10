@@ -150,7 +150,7 @@ jobs:
       continue-on-error: true
       run: |
         cd build/openwrt
-        let make_process=$(nproc)+1
+        let make_process=$(nproc)+2
         make toolchain/install -j${make_process}
     - name: If toolchain Error
       if: steps.compiletoolchain.outcome == 'failure'
@@ -187,7 +187,7 @@ jobs:
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
 
-    - name: Retrieve toolchain
+    - name: Retrieve toolchain artifact
       uses: actions/download-artifact@v2
       with:
         name: toolchain_built
