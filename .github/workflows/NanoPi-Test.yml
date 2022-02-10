@@ -83,6 +83,11 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
+    - name: ls dl
+      run: |
+        date
+        ls -al build/openwrt/dl
+
     - name: Pack toolchain
       run: |
         pwd
@@ -141,6 +146,11 @@ jobs:
     - name: Load ao mini Config
       run: |
         /bin/bash ./steps/06-create_config_from_mini_seed.sh
+
+    - name: ls dl
+      run: |
+        date
+        ls -al build/openwrt/dl
 
     - name: Download package
       run: |
