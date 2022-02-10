@@ -170,7 +170,15 @@ jobs:
     - name: Load ao mini Config
       run: |
         /bin/bash ./steps/06-create_config_from_mini_seed.sh
-        
+
+    - name: Download package
+      run: |
+        cd build/openwrt
+        make defconfig
+        make download -j10
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
+
     - name: Compile OpenWRT for R2S & R4S mini
       id: compileopenwrtmini
       continue-on-error: true
@@ -214,6 +222,14 @@ jobs:
     - name: Load ao full Config
       run: |
         /bin/bash ./steps/06-create_config_from_seed.sh
+
+    - name: Download package
+      run: |
+        cd build/openwrt
+        make defconfig
+        make download -j10
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
 
     - name: Compile OpenWRT for R2S & R4S full
       id: compileopenwrtfull
