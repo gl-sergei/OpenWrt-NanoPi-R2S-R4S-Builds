@@ -91,7 +91,7 @@ jobs:
     - name: Pack toolchain
       run: |
         pwd
-        cd ..
+        cd ~/work
         pwd
         tar --posix -cf toolchain_built.tar OpenWrt-NanoPi-R2S-R4S-Builds
 
@@ -99,7 +99,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: toolchain_built
-        path: ~/work/OpenWrt-NanoPi-R2S-R4S-Builds/toolchain_built.tar
+        path: ~/work/toolchain_built.tar
   
   build:
     needs: toolchain
@@ -115,7 +115,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: toolchain_built
-        path: ~/work/OpenWrt-NanoPi-R2S-R4S-Builds/
+        path: ~/work/
     
     - name: Unpack and clean toolchain artifact
       run: |
@@ -123,7 +123,7 @@ jobs:
         rm toolchain_built.tar
         pwd
         ls -l
-      working-directory: ..
+      working-directory: ~/work/
 
     - name: list files (debug)
       run: ls -l
