@@ -9,5 +9,5 @@ fi
 cd "$ROOTDIR/build"
 
 cd openwrt
-cp $ROOTDIR/seed/toolchain.seed .config
+cp $ROOTDIR/seed/ao.seed .config
 make defconfig
