@@ -36,7 +36,6 @@ jobs:
     # Map a step output to a job output
     outputs:
       build_date: ${{ steps.gen_build_date.outputs.build_date }}
-      output2: ${{ steps.step2.outputs.test }}
     steps:
     - id: gen_build_date
       run: echo "::set-output name=build_date::$(date +%Y.%m.%d)"

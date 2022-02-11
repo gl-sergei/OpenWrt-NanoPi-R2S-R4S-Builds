@@ -31,6 +31,7 @@ cp -R ../stangri_repo/vpn-policy-routing feeds/packages/net/
 #./scripts/feeds install -p stangri_repo luci-app-vpn-policy-routing
 
 # Time stamp with $Build_Date=$(date +%Y.%m.%d)
+echo "Build date github action $BUILD_DATE"
 echo -e '\nAO Build@'$(date "+%Y.%m.%d")'\n'  >> package/base-files/files/etc/banner
 sed -i '/DISTRIB_REVISION/d' package/base-files/files/etc/openwrt_release
 echo "DISTRIB_REVISION='$(date "+%Y.%m.%d")'" >> package/base-files/files/etc/openwrt_release

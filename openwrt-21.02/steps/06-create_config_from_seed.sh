@@ -8,7 +8,6 @@ fi
 
 cd "$ROOTDIR/build"
 
-# install feeds
 cd openwrt
-
-/bin/bash $ROOTDIR/steps/create_acl_for_luci.sh -a
+cp $ROOTDIR/openwrt-21.02/seed/ao-$1-$2.seed .config
+make defconfig
