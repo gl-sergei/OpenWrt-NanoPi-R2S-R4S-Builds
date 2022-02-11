@@ -46,6 +46,10 @@ jobs:
   
   toolchain:
     needs: init
+    strategy:
+      matrix:
+        nanopi_model: [R2S, R4S]
+    
     runs-on: ubuntu-20.04
     if: github.event.repository.owner.id == github.event.sender.id
 
@@ -54,51 +58,44 @@ jobs:
       uses: actions/checkout@main
     
     - name: Free space
-      run: |
-        /bin/bash ./workflow-scripts/free_disk_space.sh
-        df -h
+      run: ./workflow-scripts/free_disk_space.sh
 
     - name: Setup Linux Requirements
       uses: ./.github/actions/setup-devenv
 
     - name: Set GITHUB_ENV
       run: |
-        #echo "SSH_ACTIONS=false" >> $GITHUB_ENV
-        #echo "UPLOAD_BIN_DIR=false" >> $GITHUB_ENV
-        #echo "UPLOAD_FIRMWARE=true" >> $GITHUB_ENV
-        #echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
         echo "TZ=Europe/Paris" >>$GITHUB_ENV
         echo "BUILD_DATE=${{ needs.init.outputs.build_date }}" >> $GITHUB_ENV
         echo "RELTAG=${{ needs.init.outputs.release_tag }}" >> $GITHUB_ENV
         echo "OPENWRT_BRANCH=${{ github.event.inputs.openwrt_branch }}" >> $GITHUB_ENV
-        echo "NANOPI_MODEL=R4S" >> $GITHUB_ENV
+        echo "NANOPI_MODEL=${{ matrix.nanopi_model }}" >> $GITHUB_ENV
 
     - name: Show GITHUB_ENV
       run: echo $GITHUB_ENV
 
     - name: Clone OpenWrt source
-      run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/01_clone_openwrt.sh
+      run: ./openwrt-$OPENWRT_BRANCH/steps/01_clone_openwrt.sh
     
     - name: Make working copy of OpenWrt source
-      run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/02_prepare_openwrt_folder.sh
+      run: ./openwrt-$OPENWRT_BRANCH/steps/02_prepare_openwrt_folder.sh
     
     - name: Patch OpenWrt Source
-      run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/03_patch_openwrt.sh
+      run: ./openwrt-$OPENWRT_BRANCH/steps/03_patch_openwrt.sh
     
     - name: Prepare package
-      run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/04-prepare_package.sh
+      run: ./openwrt-$OPENWRT_BRANCH/steps/04-prepare_package.sh
     
     - name: Add ACL
-      run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/05-create_luci_acl.sh
+      run: ./openwrt-$OPENWRT_BRANCH/steps/05-create_luci_acl.sh
     
     - name: Load toolchain seed
-      run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/06-create_config_from_seed.sh $NANOPI_MODEL full
+      run: ./openwrt-$OPENWRT_BRANCH/steps/06-create_config_from_seed.sh $NANOPI_MODEL full
         
     - name: Download package
       id: package
       run: |
         cd build/openwrt
-        make defconfig
         make download -j10
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
@@ -190,8 +187,8 @@ jobs:
 #        echo "OPENWRT_BRANCH=${{ github.event.inputs.openwrt_branch }}" >> $GITHUB_ENV
 #        echo "NANOPI_MODEL=${{ github.event.inputs.nanopi_model }}" >> $GITHUB_ENV
     
-    - name: Load ao mini Config
-      run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/06-create_config_from_toolchain_seed.sh $NANOPI_MODEL mini
+    - name: Load AO seed (mini)
+      run: ./openwrt-$OPENWRT_BRANCH/steps/06-create_config_from_seed.sh $NANOPI_MODEL mini
 
 #    - name: Download package
 #      run: |
@@ -218,26 +215,10 @@ jobs:
     
     - name: Organize files (mini)
       id: organizemini
-      run: |
-        NANOPI_MODEL_LOW=$(echo ${NANOPI_MODEL} | tr '[:upper:]' '[:lower:]')
-        VARIANT=mini
-        rm -rf ./artifact/
-        mkdir -p ./artifact/
-        mv build/openwrt/bin/targets/rockchip/armv8/*sysupgrade.img* ./artifact/
-        cd ./artifact/
-        ls -Ahl
-        mv openwrt-rockchip-armv8-friendlyarm_nanopi-$NANOPI_MODEL_LOW-ext4-sysupgrade.img.gz OpenWrt-AO-NanoPi$NANOPI_MODEL-$VARIANT-$OPENWRT_BRANCH-$RELTAG-ext4.img.gz
-        mv openwrt-rockchip-armv8-friendlyarm_nanopi-$NANOPI_MODEL_LOW-squashfs-sysupgrade.img.gz OpenWrt-AO-NanoPi$NANOPI_MODEL-$VARIANT-$OPENWRT_BRANCH-$RELTAG-squashfs.img.gz
-        gzip -d *.gz && exit 0
-        gzip --best *.img
-        ls -Ahl
-        zip OpenWrt-AO-NanoPi$NANOPI_MODEL-$VARIANT-$OPENWRT_BRANCH-$RELTAG-ext4.zip *$VARIANT*ext4*
-        zip OpenWrt-AO-NanoPi$NANOPI_MODEL-$VARIANT-$OPENWRT_BRANCH-$RELTAG-squashfs.zip *$VARIANT*squashfs*
-        #cp ../build/openwrt/*.config ./
-        ls -Ahl
+      run: ./openwrt-$OPENWRT_BRANCH/steps/organize_files.sh $NANOPI_MODEL full $OPENWRT_BRANCH $RELTAG
     
-    - name: Load ao full config
-      run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/06-create_config_from_toolchain_seed.sh $NANOPI_MODEL full
+    - name: Load AO seed (full)
+      run: ./openwrt-$OPENWRT_BRANCH/steps/06-create_config_from_seed.sh $NANOPI_MODEL full
 
 #    - name: Download package
 #      run: |
@@ -262,23 +243,9 @@ jobs:
         echo '================================================================'
         cd build/openwrt && make -j1 V=s
     
-    - name: Organize files full
+    - name: Organize files (full)
       id: organizefull
-      run: |
-        NANOPI_MODEL_LOW=$(echo ${NANOPI_MODEL} | tr '[:upper:]' '[:lower:]')
-        VARIANT=full
-        mv build/openwrt/bin/targets/rockchip/armv8/*sysupgrade.img* ./artifact/
-        cd ./artifact/
-        ls -Ahl
-        mv openwrt-rockchip-armv8-friendlyarm_nanopi-$NANOPI_MODEL_LOW-ext4-sysupgrade.img.gz OpenWrt-AO-NanoPi$NANOPI_MODEL-$VARIANT-$OPENWRT_BRANCH-$RELTAG-ext4.img.gz
-        mv openwrt-rockchip-armv8-friendlyarm_nanopi-$NANOPI_MODEL_LOW-squashfs-sysupgrade.img.gz OpenWrt-AO-NanoPi$NANOPI_MODEL-$VARIANT-$OPENWRT_BRANCH-$RELTAG-squashfs.img.gz
-        gzip -d *.gz && exit 0
-        gzip --best *.img
-        ls -Ahl
-        zip OpenWrt-AO-NanoPi$NANOPI_MODEL-$VARIANT-$OPENWRT_BRANCH-$RELTAG-ext4.zip *$VARIANT*ext4*
-        zip OpenWrt-AO-NanoPi$NANOPI_MODEL-$VARIANT-$OPENWRT_BRANCH-$RELTAG-squashfs.zip *$VARIANT*squashfs*
-        #cp ../build/openwrt/*.config ./
-        ls -Ahl
+      run: ./openwrt-$OPENWRT_BRANCH/steps/organize_files.sh $NANOPI_MODEL full $OPENWRT_BRANCH $RELTAG
 
     - name: Create release
       id: create_release

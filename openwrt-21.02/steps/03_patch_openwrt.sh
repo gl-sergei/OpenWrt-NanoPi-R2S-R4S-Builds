@@ -24,17 +24,9 @@ rm -rf target/linux/rockchip
 cp -R $ROOTDIR/patches/$OPENWRT_BRANCH/immortalwrt/target/linux/rockchip target/linux/
 
 # remove patches that make kernel panic
-#rm target/linux/rockchip/patches-5.4/007*  
-rm target/linux/rockchip/patches-5.4/008*       # kernel oops, remove !!!!      # do not forget to run 03.sh !!!!!!!
-#rm target/linux/rockchip/patches-5.4/201*                                      # then make target/linux/clean   
-#rm target/linux/rockchip/patches-5.4/803*  
-#rm target/linux/rockchip/patches-5.4/804*  
+#  do not forget to run 03.sh !!!!!!! then make target/linux/clean   
 rm target/linux/rockchip/patches-5.4/805*       # kernel oops, remove !!!
-#rm target/linux/rockchip/patches-5.4/806*
-#rm target/linux/rockchip/patches-5.4/807*
-#rm target/linux/rockchip/patches-5.4/808*
 rm target/linux/rockchip/patches-5.4/9*
-#rm target/linux/rockchip/patches-5.4/992*  #only for r4s, to test
 
 # revert to openwrt target/linux/rockchip/image/armv8.mk
 cp $BUILDDIR/openwrt-fresh-$OPENWRT_SUFFIX/target/linux/rockchip/image/armv8.mk target/linux/rockchip/image/armv8.mk
@@ -65,7 +57,6 @@ cp $ROOTDIR/patches/$OPENWRT_BRANCH/kernel-5.4/001-r8152-v1-11-11.patch target/l
 # cleanup immortalwrt
 rm target/linux/rockchip/patches-5.4/808*
 #rm target/linux/rockchip/files/drivers/phy/rockchip/phy-rockchip-inno-usb3.c
-rm target/linux/rockchip/Documentation/devicetree/bindings/phy/phy-rockchip-inno-usb3.yaml
 
 #copy crafted patch
 cp $ROOTDIR/patches/$OPENWRT_BRANCH/kernel-5.4/add-rk3328-usb3-phy-driver.patch target/linux/rockchip/patches-5.4/808-add-rk3328-usb3-phy-driver.patch
