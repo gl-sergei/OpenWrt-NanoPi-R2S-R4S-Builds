@@ -44,4 +44,4 @@ jobs:
     runs-on: ubuntu-20.04
     needs: init
     steps:
-    - run: echo ${{ needs.init.outputs.build_date }} ${{ jobs.init.outputs.build_date }}
+    - run: echo ${{ needs.init.outputs.build_date }}
