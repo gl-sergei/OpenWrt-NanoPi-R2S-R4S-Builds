@@ -29,138 +29,20 @@ on:
         type: string
         
 jobs:
-  toolchain:
+  init:
     runs-on: ubuntu-20.04
     if: github.event.repository.owner.id == github.event.sender.id
 
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      build_date: ${{ steps.gen_build_date.outputs.build_date }}
+      output2: ${{ steps.step2.outputs.test }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@main
-    
-    - name: Setup Linux Requirements
-      uses: ./.github/actions/setup-devenv
-
-    - name: Set GITHUB_ENV
-      run: |
-        echo "SSH_ACTIONS=false" >> $GITHUB_ENV
-        echo "UPLOAD_BIN_DIR=false" >> $GITHUB_ENV
-        echo "UPLOAD_FIRMWARE=true" >> $GITHUB_ENV
-        echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
-        echo "TZ=Europe/Paris" >>$GITHUB_ENV
-        echo "Build_Date=$(date +%Y.%m.%d)" >> $GITHUB_ENV
-        echo "RELTAG=v$(date +'%Y%m%d').${{ github.event.inputs.release_id }}" >> $GITHUB_ENV
-        echo "OPENWRT_BRANCH=${{ github.event.inputs.openwrt_branch }}" >> $GITHUB_ENV
-        echo "NANOPI_MODEL=${{ github.event.inputs.nanopi_model }}" >> $GITHUB_ENV
-
-    - name: Show GITHUB_ENV
-      run: echo $GITHUB_ENV
-
-    - name: Clone OpenWrt source
-      run: /bin/bash ./steps/$OPENWRT_BRANCH/01_clone_openwrt.sh
-    
-    - name: Make working copy of OpenWrt source
-      run: /bin/bash ./steps/$OPENWRT_BRANCH/02_prepare_openwrt_folder.sh
-    
-    - name: Patch OpenWrt Source
-      run: /bin/bash ./steps/$OPENWRT_BRANCH/$NANOPI_MODEL/03_patch_openwrt.sh
-    
-    - name: Prepare package
-      run: /bin/bash ./steps/04-prepare_package.sh
-    
-    - name: Add ACL
-      run: |
-        /bin/bash ./steps/05-create_luci_acl.sh
-    - name: Load toolchain seed
-      run: |
-        /bin/bash ./steps/06-create_config_from_toolchain_seed.sh
-        
-    - name: Download package
-      id: package
-      run: |
-        cd build/openwrt
-        make defconfig
-        make download -j10
-        find dl -size -1024c -exec ls -l {} \;
-        find dl -size -1024c -exec rm -f {} \;
-
-    - name: ls dl
-      run: |
-        date
-        ls -al build/openwrt/dl
-
-    - name: Pack toolchain
-      run: |
-        pwd
-        cd ~/work
-        pwd
-        tar --posix -cf toolchain_built.tar OpenWrt-NanoPi-R2S-R4S-Builds
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: toolchain_built
-        path: ~/work/toolchain_built.tar
-  
-  build:
-    needs: toolchain
-    runs-on: ubuntu-20.04
+    - id: gen_build_date
+      run: echo "::set-output name=build_date::$(date +%Y.%m.%d)"
+  job2:
+    runs-on: ubuntu-latest
+    needs: init
     steps:
-    - name: Dump github context
-      run: echo "$GITHUB_CONTEXT"
-      shell: bash
-      env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
-
-    - name: Retrieve toolchain artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: toolchain_built
-        path: ~/work/
-    
-    - name: Unpack and clean toolchain artifact
-      run: |
-        cd ~/work/
-        tar xf toolchain_built.tar
-        rm toolchain_built.tar
-        pwd
-        ls -l
-
-    - name: list files (debug)
-      run: ls -l
-
-    - name: Prepare Build deps
-      uses: ./.github/actions/setup-devenv
-    
-    - name: Set env
-      run: |
-        echo "SSH_ACTIONS=false" >> $GITHUB_ENV
-        echo "UPLOAD_BIN_DIR=false" >> $GITHUB_ENV
-        echo "UPLOAD_FIRMWARE=true" >> $GITHUB_ENV
-        echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
-        echo "TZ=Europe/Paris" >>$GITHUB_ENV
-        echo "Build_Date=$(date +%Y.%m.%d)" >> $GITHUB_ENV
-        echo "RELTAG=v$(date +'%Y%m%d').${{ github.event.inputs.release_id }}" >> $GITHUB_ENV
-        echo "OPENWRT_BRANCH=${{ github.event.inputs.openwrt_branch }}" >> $GITHUB_ENV
-        echo "NANOPI_MODEL=${{ github.event.inputs.nanopi_model }}" >> $GITHUB_ENV
-
-    - name: ls dl
-      run: |
-        date
-        ls -al build/openwrt/dl
-
-    - name: Load ao full Config
-      run: |
-        /bin/bash ./steps/06-create_config_from_seed.sh
-
-    - name: Download package
-      run: |
-        cd build/openwrt
-        make defconfig
-        make download -j10
-        find dl -size -1024c -exec ls -l {} \;
-        find dl -size -1024c -exec rm -f {} \;
-
-    - name: ls dl
-      run: |
-        date
-        ls -al build/openwrt/dl
+    - run: echo ${{ needs.init.outputs.build_date }} ${{ jobs.init.outputs.build_date }}

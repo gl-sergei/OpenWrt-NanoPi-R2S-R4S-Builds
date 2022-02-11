@@ -39,6 +39,10 @@ Automated builds of OpenWrt for FriendlyARM NanoPi R2S & R4S boards
 
 ## Changelog
 
+#### 2021-02-15
+- Add losetup, cfdisk in builds. Fix issue #11 : Check docs/ how to expand online.
+- Branch 21.02 : use gcc 10.2
+- Optimized builds for devices R4S:-mcpu=cortex-a72.cortex-a53+crypto+crc R2S:-mcpu=cortex-a53+crypto+crc
 #### 2021-12-23
 - Add libreswan package and deps in full build
 #### 2021-12-23
