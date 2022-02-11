@@ -33,7 +33,6 @@ jobs:
     runs-on: ubuntu-20.04
     if: github.event.repository.owner.id == github.event.sender.id
 
-    runs-on: ubuntu-latest
     # Map a step output to a job output
     outputs:
       build_date: ${{ steps.gen_build_date.outputs.build_date }}
@@ -42,7 +41,7 @@ jobs:
     - id: gen_build_date
       run: echo "::set-output name=build_date::$(date +%Y.%m.%d)"
   job2:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: init
     steps:
     - run: echo ${{ needs.init.outputs.build_date }} ${{ jobs.init.outputs.build_date }}
