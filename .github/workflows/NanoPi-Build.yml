@@ -53,15 +53,20 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@main
     
+    - name: Free space
+      run: |
+        /bin/bash ./workflow-scripts/free_disk_space.sh
+        df -h
+
     - name: Setup Linux Requirements
       uses: ./.github/actions/setup-devenv
 
     - name: Set GITHUB_ENV
       run: |
-        echo "SSH_ACTIONS=false" >> $GITHUB_ENV
-        echo "UPLOAD_BIN_DIR=false" >> $GITHUB_ENV
-        echo "UPLOAD_FIRMWARE=true" >> $GITHUB_ENV
-        echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
+        #echo "SSH_ACTIONS=false" >> $GITHUB_ENV
+        #echo "UPLOAD_BIN_DIR=false" >> $GITHUB_ENV
+        #echo "UPLOAD_FIRMWARE=true" >> $GITHUB_ENV
+        #echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
         echo "TZ=Europe/Paris" >>$GITHUB_ENV
         echo "BUILD_DATE=${{ needs.init.outputs.build_date }}" >> $GITHUB_ENV
         echo "RELTAG=${{ needs.init.outputs.release_tag }}" >> $GITHUB_ENV
@@ -87,7 +92,7 @@ jobs:
       run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/05-create_luci_acl.sh
     
     - name: Load toolchain seed
-      run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/06-create_config_from_toolchain_seed.sh $NANOPI_MODEL full
+      run: /bin/bash ./openwrt-$OPENWRT_BRANCH/steps/06-create_config_from_seed.sh $NANOPI_MODEL full
         
     - name: Download package
       id: package
@@ -165,20 +170,20 @@ jobs:
 #        #find build_dir/{host*,toolchain-*} -name .built\* -exec touch {} \;
 #        touch staging_dir/{host*,toolchain-*}/stamp/.*
 #
-    - name: Free space
-      run: |
-        /bin/bash ./workflow-scripts/free_disk_space.sh
-        df -h
-    
+#    - name: Free space
+#      run: |
+#        /bin/bash ./workflow-scripts/free_disk_space.sh
+#        df -h
+#    
 #    - name: Prepare Build deps
 #      uses: ./.github/actions/setup-devenv
-    
+#    
 #    - name: Set env
 #      run: |
-#        echo "SSH_ACTIONS=false" >> $GITHUB_ENV
-#        echo "UPLOAD_BIN_DIR=false" >> $GITHUB_ENV
-#        echo "UPLOAD_FIRMWARE=true" >> $GITHUB_ENV
-#        echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
+#        #echo "SSH_ACTIONS=false" >> $GITHUB_ENV
+#        #echo "UPLOAD_BIN_DIR=false" >> $GITHUB_ENV
+#        #echo "UPLOAD_FIRMWARE=true" >> $GITHUB_ENV
+#        #echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
 #        echo "TZ=Europe/Paris" >> $GITHUB_ENV
 #        echo "BUILD_DATE=${{ needs.init.outputs.build_date }}" >> $GITHUB_ENV
 #        echo "RELTAG=${{ needs.init.outputs.release_tag }}" >> $GITHUB_ENV
@@ -196,7 +201,7 @@ jobs:
 #        find dl -size -1024c -exec ls -l {} \;
 #        find dl -size -1024c -exec rm -f {} \;
 
-    - name: Compile OpenWRT mini
+    - name: Compile OpenWRT (mini)
       id: compileopenwrtmini
       continue-on-error: true
       run: |
@@ -211,7 +216,7 @@ jobs:
         echo '================================================================'
         cd build/openwrt && make -j1 V=s
     
-    - name: Organize files mini
+    - name: Organize files (mini)
       id: organizemini
       run: |
         NANOPI_MODEL_LOW=$(echo ${NANOPI_MODEL} | tr '[:upper:]' '[:lower:]')
@@ -242,7 +247,7 @@ jobs:
 #        find dl -size -1024c -exec ls -l {} \;
 #        find dl -size -1024c -exec rm -f {} \;
 
-    - name: Compile OpenWRT for R2S & R4S full
+    - name: Compile OpenWRT (full)
       id: compileopenwrtfull
       continue-on-error: true
       run: |
